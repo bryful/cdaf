@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="cdaf/cdaf.vcxproj" Id="19773122-a240-4934-a54b-f646a6fbb4f6" />
+</Solution>
