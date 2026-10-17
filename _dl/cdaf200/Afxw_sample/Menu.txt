@@ -1,0 +1,14 @@
+afxw F's Tools
+"cdaf"  "$V"afx"\findCD.exe"  "$P"
+"wp" "C:\Bin\cmds\wp.exe" "$P"
+"p2j" "C:\Bin\cmds\png2jpeg.exe" "$P"
+"rh" "C:\Bin\cmds\rh.exe" "$P"
+"rb" "C:\Bin\cmds\rb.exe" "$P"
+"fs" "C:\Bin\cmds\fs.exe" "$P"
+"fs -r" "C:\Bin\cmds\fs.exe" -r "$P"
+"Dir To Zip" "C:\bin\cmds\d2z.exe" --store $MF
+"Arc To D" "C:\bin\cmds\a2d.exe" $MF
+"Rar To Zip" "C:\bin\cmds\r2z.exe" $MF
+"Rar To Zip All" "C:\bin\rar\RarToZip.exe" "$P"
+"renNFD" "C:\Bin\cmds\renNFD" "$P"
+"BinaryEdit" "C:\Bin\FavBinEdit\FavBinEdit.exe" "$P\$F"
