@@ -30,6 +30,7 @@ struct App
     wchar_t side = L'l';
     std::vector<fs::path> found;
     bool results = false;
+    bool activeSideAcquired = false;
     int inputWidth = 0;
     int inputHeight = 0;
     HBRUSH backgroundBrush = CreateSolidBrush(BACKGROUND);
@@ -415,23 +416,28 @@ void search(HWND window, App& app)
     MapDialogRect(window, &spacing);
     int buttonHeight = 0;
     const int buttonTop = listRect.top + height + spacing.bottom;
-    for (int id : { IDC_LEFT, IDC_RIGHT })
+    if (!app.activeSideAcquired)
     {
-        HWND button = GetDlgItem(window, id);
-        RECT rect{};
-        GetWindowRect(button, &rect);
-        MapWindowPoints(nullptr, window, reinterpret_cast<POINT*>(&rect), 2);
-        buttonHeight = std::max(buttonHeight, static_cast<int>(rect.bottom - rect.top));
-        SetWindowPos(button, nullptr, rect.left, buttonTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+        for (int id : { IDC_LEFT, IDC_RIGHT })
+        {
+            HWND button = GetDlgItem(window, id);
+            RECT rect{};
+            GetWindowRect(button, &rect);
+            MapWindowPoints(nullptr, window, reinterpret_cast<POINT*>(&rect), 2);
+            buttonHeight = std::max(buttonHeight, static_cast<int>(rect.bottom - rect.top));
+            SetWindowPos(button, nullptr, rect.left, buttonTop, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+        }
     }
+    const int contentHeight = app.activeSideAcquired ? listRect.top + height + spacing.bottom :
+        buttonTop + buttonHeight + spacing.bottom;
     SetWindowPos(window, nullptr, 0, 0, app.inputWidth,
-        app.inputHeight - client.bottom + buttonTop + buttonHeight + spacing.bottom, SWP_NOMOVE | SWP_NOZORDER);
+        app.inputHeight - client.bottom + contentHeight, SWP_NOMOVE | SWP_NOZORDER);
     app.results = true;
     InvalidateRect(window, nullptr, TRUE);
     SetWindowTextW(window, L"findCD — 選択 (1–9, 0 / Escで終了)");
     ShowWindow(list, SW_SHOW);
-    ShowWindow(GetDlgItem(window, IDC_LEFT), SW_SHOW);
-    ShowWindow(GetDlgItem(window, IDC_RIGHT), SW_SHOW);
+    ShowWindow(GetDlgItem(window, IDC_LEFT), app.activeSideAcquired ? SW_HIDE : SW_SHOW);
+    ShowWindow(GetDlgItem(window, IDC_RIGHT), app.activeSideAcquired ? SW_HIDE : SW_SHOW);
     SendMessageW(list, LB_SETCURSEL, 0, 0);
     centerWindow(window);
     SetFocus(list);
@@ -696,7 +702,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
         else
         {
             // 取得できない場合は、読み込み済みの設定をそのまま使う。
-            tryGetActiveSide(app.side);
+            app.activeSideAcquired = SUCCEEDED(tryGetActiveSide(app.side));
             const INT_PTR dialogResult = DialogBoxParamW(instance, MAKEINTRESOURCEW(IDD_MAIN), nullptr,
                 dialogProc, reinterpret_cast<LPARAM>(&app));
             if (dialogResult == -1)
