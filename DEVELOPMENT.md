@@ -13,4 +13,6 @@ MSBuild cdaf.slnx /p:Configuration=Release /p:Platform=x64 /p:PreferredToolArchi
 
 findCDはWin32ダイアログを使用します。設定は`HKEY_CURRENT_USER\Software\bry-ful\findCD`の`AFXW`と`Side`に保存します。
 
+起動時のL／R初期値は、起動中のあふのCOMオブジェクト`afxw.obj`の`SrcWin()`（0＝左、1＝右）から取得します。COM未登録・接続失敗・不正な戻り値などの場合は保存済み設定を維持します。取得した初期値だけでは設定を書き換えず、ユーザーの切り替え操作時に保存します。COM初期化とインターフェイスの解放は取得処理内で完結させます。
+
 確認項目は、直下のみの検索、大文字小文字を区別しないAND検索、0／1／10／11件の結果、Enter／Escape／上下キー／数字キー／クリック、左右選択の保存、AFXW.EXEの検出とファイル選択、各ダイアログの中央表示です。

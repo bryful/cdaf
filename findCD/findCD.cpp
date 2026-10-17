@@ -3,6 +3,8 @@
 #include <commdlg.h>
 #include <shellapi.h>
 #include <dwmapi.h>
+#include <tlhelp32.h>
+#include <wrl/client.h>
 #include <algorithm>
 #include <cwctype>
 #include <filesystem>
@@ -147,6 +149,88 @@ bool isFile(const fs::path& path)
 {
     std::error_code ec;
     return fs::is_regular_file(path, ec);
+}
+
+HRESULT tryGetActiveSide(wchar_t& side)
+{
+    // あふが終了している場合、COM接続のためだけに新規起動しない。
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE)
+    {
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
+    PROCESSENTRY32W entry{};
+    entry.dwSize = sizeof(entry);
+    bool running = false;
+    if (Process32FirstW(snapshot, &entry))
+    {
+        do
+        {
+            if (_wcsicmp(entry.szExeFile, L"AFXW.EXE") == 0)
+            {
+                running = true;
+                break;
+            }
+        } while (Process32NextW(snapshot, &entry));
+    }
+    CloseHandle(snapshot);
+    if (!running)
+    {
+        return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+    }
+
+    const HRESULT initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    if (FAILED(initialized))
+    {
+        return initialized;
+    }
+    const HRESULT status = [&]() -> HRESULT
+    {
+        CLSID classId{};
+        HRESULT hr = CLSIDFromProgID(L"afxw.obj", &classId);
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+        Microsoft::WRL::ComPtr<IDispatch> object;
+        hr = CoCreateInstance(classId, nullptr, CLSCTX_LOCAL_SERVER, IID_PPV_ARGS(object.GetAddressOf()));
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+        wchar_t methodName[] = L"SrcWin";
+        LPOLESTR name = methodName;
+        DISPID methodId = DISPID_UNKNOWN;
+        hr = object->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &methodId);
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+        DISPPARAMS arguments{};
+        VARIANT value;
+        VariantInit(&value);
+        hr = object->Invoke(methodId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD,
+            &arguments, &value, nullptr, nullptr);
+        if (SUCCEEDED(hr))
+        {
+            hr = VariantChangeType(&value, &value, 0, VT_I4);
+            if (SUCCEEDED(hr))
+            {
+                if (value.lVal == 0 || value.lVal == 1)
+                {
+                    side = value.lVal == 1 ? L'r' : L'l';
+                }
+                else
+                {
+                    hr = E_UNEXPECTED;
+                }
+            }
+        }
+        VariantClear(&value);
+        return hr;
+    }();
+    CoUninitialize();
+    return status;
 }
 
 bool resolveAfxw(HWND owner, App& app)
@@ -611,6 +695,8 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
         }
         else
         {
+            // 取得できない場合は、読み込み済みの設定をそのまま使う。
+            tryGetActiveSide(app.side);
             const INT_PTR dialogResult = DialogBoxParamW(instance, MAKEINTRESOURCEW(IDD_MAIN), nullptr,
                 dialogProc, reinterpret_cast<LPARAM>(&app));
             if (dialogResult == -1)
