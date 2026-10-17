@@ -1,5 +1,6 @@
 afxw F's Tools
 "cdaf"  "$V"afx"\findCD.exe"  "$P"
+"fdList"  "$V"afx"\fdList.exe"
 "wp" "C:\Bin\cmds\wp.exe" "$P"
 "p2j" "C:\Bin\cmds\png2jpeg.exe" "$P"
 "rh" "C:\Bin\cmds\rh.exe" "$P"
