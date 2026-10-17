@@ -4,4 +4,5 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="cdaf/cdaf.vcxproj" Id="19773122-a240-4934-a54b-f646a6fbb4f6" />
+  <Project Path="findCD/findCD.vcxproj" Id="eaced467-54e1-42a3-b117-43462b8e7ae8" />
 </Solution>
