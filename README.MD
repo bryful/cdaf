@@ -4,6 +4,8 @@
 
 黒基調のコンパクトな画面で検索・選択でき、複数語のAND検索に対応します。コマンドライン版については[cdafのREADME](cdaf/README.MD)を参照してください。
 
+noteに使い方を書きました。[cdaf (Change Directory AFxw)]I(https://note.com/bryful/n/n292d289ff753)
+
 ## 動作環境
 
 Windows x64、あふｗ（`AFXW.EXE`）。

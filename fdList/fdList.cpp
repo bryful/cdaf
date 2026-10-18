@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include "resource.h"
 
 namespace fs = std::filesystem;
 using Microsoft::WRL::ComPtr;
@@ -696,12 +697,13 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
             type.lpfnWndProc = windowProc;
             type.hInstance = instance;
             type.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-            type.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
+            type.hIcon = LoadIconW(instance, MAKEINTRESOURCEW(IDI_APP));
+            if (!type.hIcon) { throw Failure{L"fdListのアプリアイコンを読み込めません。"}; }
             type.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1);
             type.lpszClassName = L"fdListWindow";
             if (!RegisterClassW(&type)) { throw Failure{L"ウィンドウクラスを登録できません。"}; }
             const auto title = L"fdList — " + app.afx.path.wstring();
-            HWND window = CreateWindowExW(0, type.lpszClassName, title.c_str(), WS_OVERLAPPEDWINDOW,
+            HWND window = CreateWindowExW(WS_EX_TOPMOST, type.lpszClassName, title.c_str(), WS_OVERLAPPEDWINDOW,
                 bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top,
                 nullptr, nullptr, instance, &app);
             if (!window) { throw Failure{L"fdListのウィンドウを作成できません。"}; }

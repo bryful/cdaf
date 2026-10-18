@@ -1,0 +1,3 @@
+afxw F's Tools
+"findCD"  "$V"afx"\findCD.exe"  "$P"
+"fdList"  "$V"afx"\fdList.exe"

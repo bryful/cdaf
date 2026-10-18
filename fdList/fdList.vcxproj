@@ -153,6 +153,12 @@
   <ItemGroup>
     <ClCompile Include="fdList.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="fdList.rc" />
+    <ClInclude Include="resource.h" />
+    <Image Include="assets\fdList.ico" />
+    <Image Include="assets\fdList.png" />
+  </ItemGroup>
 
 
 
