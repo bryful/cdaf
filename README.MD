@@ -88,6 +88,8 @@ AFXW.EXEのパスとL／R設定は、ユーザーごとに`HKEY_CURRENT_USER\Sof
 
 ## fdList
 
+<img src="fdList/assets/fdList.png" alt="fdListのアプリアイコン" width="64" height="64">
+
 fdList は、あふｗで現在操作しているフォルダの直下にあるディレクトリを一覧表示し、名前で絞り込んで移動できる Windows x64 用アプリです。黒基調の画面で、入力しながら候補を探せます。
 
 ### 起動と検索
